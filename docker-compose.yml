@@ -12,6 +12,8 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     restart: always
+    networks:
+      - default
   litespeed:
     image: litespeedtech/openlitespeed:1.8.3-lsphp83
     container_name: litespeed
@@ -24,9 +26,16 @@ services:
       - ./sites:/var/www/vhosts/
       - ./acme:/root/.acme.sh/
       - ./logs:/usr/local/lsws/logs/
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/udp
+      - 7080:7080
     restart: always
     environment:
       TZ: ${TimeZone}
+    networks:
+      - default
   redis:
     image: "redis:alpine"
     logging:
@@ -38,3 +47,8 @@ services:
     environment:
       - REDIS_REPLICATION_MODE=master
     restart: always
+    networks:
+      - default
+networks:
+  default:
+    driver: bridge
