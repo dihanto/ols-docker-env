@@ -3,7 +3,7 @@ services:
     image: mariadb:11.4
     logging:
       driver: none
-    command: ["--max-allowed-packet=512M"]
+    command: [ "--max-allowed-packet=512M" ]
     volumes:
       - "./data/db:/var/lib/mysql:delegated"
     environment:
@@ -12,10 +12,8 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     restart: always
-    networks:
-      - default
   litespeed:
-    image: litespeedtech/openlitespeed:${OLS_VERSION}-${PHP_VERSION}
+    image: litespeedtech/openlitespeed:1.8.3-lsphp83
     container_name: litespeed
     env_file:
       - .env
@@ -26,26 +24,9 @@ services:
       - ./sites:/var/www/vhosts/
       - ./acme:/root/.acme.sh/
       - ./logs:/usr/local/lsws/logs/
-    ports:
-      - 80:80
-      - 443:443
-      - 443:443/udp
-      - 7080:7080
     restart: always
     environment:
       TZ: ${TimeZone}
-    networks:
-      - default
-  phpmyadmin:
-    image: bitnami/phpmyadmin:5.2.2
-    ports:
-      - 8080:8080
-      - 8443:8443
-    environment:
-        DATABASE_HOST: mysql
-    restart: always
-    networks:
-      - default
   redis:
     image: "redis:alpine"
     logging:
@@ -57,8 +38,3 @@ services:
     environment:
       - REDIS_REPLICATION_MODE=master
     restart: always
-    networks:
-      - default
-networks:
-  default:
-    driver: bridge
