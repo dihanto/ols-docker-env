@@ -26,6 +26,11 @@ services:
       - ./sites:/var/www/vhosts/
       - ./acme:/root/.acme.sh/
       - ./logs:/usr/local/lsws/logs/
+    ports:
+      - 800:80
+      - 4430:443
+      - 4430:443/udp
+      - 7081:7080
     restart: always
     environment:
       TZ: ${TimeZone}
