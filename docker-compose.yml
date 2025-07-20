@@ -28,11 +28,6 @@ services:
       - ./acme:/root/.acme.sh/
       - ./logs:/usr/local/lsws/logs/
     entrypoint: /bin/sh -c "chmod +x /app/bin/demosite.sh && /usr/local/bin/docker-entrypoint.sh"
-    ports:
-      - 801:80
-      - 4431:443
-      - 4431:443/udp
-      - 7084:7080
     restart: always
     environment:
       TZ: ${TimeZone}
