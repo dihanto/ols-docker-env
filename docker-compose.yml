@@ -15,7 +15,7 @@ services:
     networks:
       - default
   litespeed:
-    image: litespeedtech/openlitespeed:1.8.3-lsphp83
+    image: litespeedtech/openlitespeed:${OLS_VERSION}-${PHP_VERSION}
     container_name: litespeed
     env_file:
       - .env
@@ -23,14 +23,16 @@ services:
       - ./lsws/conf:/usr/local/lsws/conf
       - ./lsws/admin-conf:/usr/local/lsws/admin/conf
       - ./bin/container:/usr/local/bin
+      - ./bin:/app/bin
       - ./sites:/var/www/vhosts/
       - ./acme:/root/.acme.sh/
       - ./logs:/usr/local/lsws/logs/
+    entrypoint: /bin/sh -c "chmod +x /app/bin/demosite.sh && /usr/local/bin/docker-entrypoint.sh"
     ports:
-      - 800:80
-      - 4430:443
-      - 4430:443/udp
-      - 7081:7080
+      - 801:80
+      - 4431:443
+      - 4431:443/udp
+      - 7084:7080
     restart: always
     environment:
       TZ: ${TimeZone}
