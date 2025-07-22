@@ -7,10 +7,10 @@ services:
     volumes:
       - "./data/db:/var/lib/mysql:delegated"
     environment:
-      MYSQL_ROOT_PASSWORD: ${SERVICE_PASSWORD_ROOT}
+      MYSQL_ROOT_PASSWORD: SERVICE_PASSWORD_ROOT
       MYSQL_DATABASE: wordpress
-      MYSQL_USER: ${SERVICE_USER_WORDPRESS}
-      MYSQL_PASSWORD: ${SERVICE_PASSWORD_WORDPRESS}
+      MYSQL_USER: SERVICE_USER_WORDPRESS
+      MYSQL_PASSWORD: SERVICE_PASSWORD_WORDPRESS
     restart: always
     networks:
       - default
