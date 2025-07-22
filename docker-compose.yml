@@ -24,7 +24,7 @@ services:
       start_period: 10s
 
   litespeed:
-    image: litespeedtech/openlitespeed:${OLS_VERSION}-${PHP_VERSION}
+    image: litespeedtech/openlitespeed:1.8.3-lsphp83
     container_name: litespeed
     env_file:
       - .env
