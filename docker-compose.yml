@@ -7,10 +7,10 @@ services:
     volumes:
       - "./data/db:/var/lib/mysql:delegated"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: $SERVICE_PASSWORD_ROOT
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: $SERVICE_USER_WORDPRESS
+      MYSQL_PASSWORD: $SERVICE_PASSWORD_WORDPRESS
     restart: always
     networks:
       - default
@@ -27,7 +27,6 @@ services:
       - ./sites:/var/www/vhosts/
       - ./acme:/root/.acme.sh/
       - ./logs:/usr/local/lsws/logs/
-    entrypoint: /bin/sh -c "chmod +x /app/bin/demosite.sh && /usr/local/bin/docker-entrypoint.sh"
     restart: always
     environment:
       TZ: ${TimeZone}
