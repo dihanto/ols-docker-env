@@ -1,50 +1,84 @@
+version: "3.8"
+
 services:
   mysql:
     image: mariadb:11.4
-    logging:
-      driver: none
-    command: [ "--max-allowed-packet=512M" ]
-    volumes:
-      - "./data/db:/var/lib/mysql:delegated"
+    command: [ "--max-allowed-packet=4G" ]
     environment:
-      MYSQL_ROOT_PASSWORD: $SERVICE_PASSWORD_ROOT
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: $SERVICE_USER_WORDPRESS
-      MYSQL_PASSWORD: $SERVICE_PASSWORD_WORDPRESS
+      - MYSQL_ROOT_PASSWORD=$SERVICE_PASSWORD_ROOT_MYSQL
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=$SERVICE_USER_MYSQL
+      - MYSQL_PASSWORD=$SERVICE_PASSWORD_MYSQL
+    volumes:
+      - mysql_data:/var/lib/mysql
     restart: always
     networks:
       - default
+    logging:
+      driver: "none"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   litespeed:
-    image: litespeedtech/openlitespeed:1.8.3-lsphp83
+    image: litespeedtech/openlitespeed:${OLS_VERSION}-${PHP_VERSION}
     container_name: litespeed
     env_file:
       - .env
     volumes:
-      - ./lsws/conf:/usr/local/lsws/conf
-      - ./lsws/admin-conf:/usr/local/lsws/admin/conf
-      - ./bin/container:/usr/local/bin
-      - ./bin:/app/bin
-      - ./sites:/var/www/vhosts/
-      - ./acme:/root/.acme.sh/
-      - ./logs:/usr/local/lsws/logs/
+      - lsws_conf:/usr/local/lsws/conf
+      - lsws_admin_conf:/usr/local/lsws/admin/conf
+      - lsws_bin:/usr/local/bin
+      - lsws_sites:/var/www/vhosts/
+      - lsws_acme:/root/.acme.sh/
+      - lsws_logs:/usr/local/lsws/logs/
     restart: always
     environment:
-      TZ: $TimeZone
+      - SERVICE_FQDN_WORDPRESS
+      - TZ=$TimeZone
     networks:
       - default
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:80" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   redis:
-    image: "redis:alpine"
-    logging:
-      driver: none
-    # command: redis-server --requirepass 8b405f60665e48f795752e534d93b722
-    volumes:
-      - ./redis/data:/var/lib/redis
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    image: redis:alpine
     environment:
-      - REDIS_REPLICATION_MODE=master
+      REDIS_REPLICATION_MODE: master
+    volumes:
+      - redis_data:/var/lib/redis
+      - redis_conf:/usr/local/etc/redis/redis.conf
     restart: always
     networks:
       - default
+    logging:
+      driver: "none"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  mysql_data:
+  lsws_conf:
+  lsws_admin_conf:
+  lsws_bin:
+  lsws_sites:
+  lsws_acme:
+  lsws_logs:
+  redis_data:
+  redis_conf:
+
+
 networks:
   default:
     driver: bridge
